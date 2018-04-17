@@ -5,12 +5,35 @@ import Header from './Components/header';
 import TodoInput from './Components/todoinput';
 import TodoItem from './Components/todoItem';
 
+function UniqueIdGenarator(){
+}
+
+UniqueIdGenarator.prototype.getNewId=function(){
+  this.id = JSON.parse(localStorage.getItem('lastId'));
+  if(!this.id){
+    this.id = 0;
+  }
+  let newId = 1+this.id;
+  localStorage.setItem('lastId',newId);
+  return newId;
+}
+
+UniqueIdGenarator.prototype.getId=function(){
+  let newd=JSON.parse(localStorage.getItem('lastId'));
+  if(!newd)
+  {
+    newd =1;
+  }
+  return newd;
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
+    this.uig = new UniqueIdGenarator();
     this.state = {
       todos: this.getTodos(),
-      id: this.getNextId()
+      id: this.uig.getNewId()
     };
     this.addTodo = this.addTodo.bind(this);
     this.removeTodo = this.removeTodo.bind(this);
@@ -21,43 +44,24 @@ class App extends Component {
     if(!todos){
       todos = [
         {
-          text: 'add todo',
-          id: 0
+          id: this.uig.getId(),
+          text: 'add todo'
         }
       ]
       localStorage.setItem('todos',JSON.stringify(todos));
-      this.getNextId();
     }
     return todos;
-  }
-
-  getNextId(){
-    let id=localStorage.getItem('id')
-    if(!id)
-    {
-      id :0
-    }
-    else
-      {
-          id=[
-      {
-        id:1+id
-      }
-    ]
-    localStorage.setItem('id',JSON.stringify(id));
-  }
-  return id;
   }
 
   addTodo(todoText) {
     console.log(this.state.todos);
     let todos = this.state.todos.slice();
     console.log(todos);
-    todos.push({id: this.state.nextId, text: todoText});
+    todos.push({id: this.uig.getNewId(), text: todoText});
     localStorage.setItem('todos',JSON.stringify(todos));
     this.setState({
       todos: todos,
-      id: 1+this.id
+      id: this.id
     });
   }
 
@@ -78,6 +82,7 @@ class App extends Component {
         <div className="todo-wrapper">
           <Header />
           <TodoInput todoText="" addTodo={this.addTodo} />
+          <sample category="" addcategory={this.addcategory} />
           <ul>
             {
               this.state.todos.map((todo) => {
@@ -90,5 +95,4 @@ class App extends Component {
     );
   }
 }
-
 export default App;
